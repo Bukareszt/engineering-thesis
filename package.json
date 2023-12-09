@@ -4,25 +4,38 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:unit": "ts-mocha ./src/*spec.ts",
     "start:dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "lint-and-fix": "eslint . --ext .ts --fix"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/express": "^4.17.18",
+    "@asteasolutions/zod-to-openapi": "^6.3.0",
+    "@types/body-parser": "^1.19.5",
+    "@types/chai": "^4.3.9",
+    "@types/expect": "^24.3.0",
+    "@types/express": "^4.17.21",
+    "@types/mocha": "^10.0.3",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.7.4",
+    "chai": "^4.3.10",
     "eslint": "^8.50.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "prettier": "^3.0.3",
+    "prettier-plugin-organize-imports": "^3.2.4",
+    "prettier-plugin-sort-imports": "^1.7.2",
+    "ts-mocha": "^10.0.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "axios": "^1.6.2",
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2",
+    "express-async-errors": "^3.1.1",
+    "zod": "^3.22.4"
   },
   "engines": {
     "node": ">=20.0.0"

@@ -1,13 +1,14 @@
-import express from 'express';
+import { idGenerator } from './adapters/idGenerator';
+import { bootstrap } from './app';
+import { workflowsModule } from './domains/workflows/workflowsModule';
+import { startInMemoryActionExecutedListener } from './listeners/ActionExecutedListener';
 
-const port = 3000;
+function start() {
+  const workflowsMdl = workflowsModule({ idGenerator });
+  startInMemoryActionExecutedListener(
+    workflowsMdl.workflowsModule.finishNodeExecution
+  );
+  bootstrap(workflowsMdl);
+}
 
-const app = express();
-
-app.get('/', (req, res) => {
-  res.send('Welcome to Express & TypeScript Server');
-});
-
-app.listen(port, () => {
-  console.log(`Server is Fire at http://localhost:${port}`);
-});
+start();
