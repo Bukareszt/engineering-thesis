@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:unit": "ts-mocha ./src/*spec.ts",
+    "test:unit": "ts-mocha ./tests/*spec.ts",
     "start:dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "start:dev2": "ts-node-dev --respawn --transpile-only src/action2.ts",
     "lint-and-fix": "eslint . --ext .ts --fix"
   },
   "author": "",
@@ -33,6 +34,7 @@
   "dependencies": {
     "axios": "^1.6.2",
     "body-parser": "^1.20.2",
+    "cron": "^3.1.6",
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",
     "zod": "^3.22.4"

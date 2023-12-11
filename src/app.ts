@@ -19,9 +19,19 @@ export const bootstrap = ({
   triggersModule: TriggersModule;
 }) => {
   const app = express();
-  const port = 3000;
+  const port = 3001;
 
   app.use(bodyParser.json());
+  app.use(function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, PUT, POST');
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept'
+    );
+    next();
+  });
+
   app.use('/triggers', triggersRouter({ triggersModule }));
 
   app.use(

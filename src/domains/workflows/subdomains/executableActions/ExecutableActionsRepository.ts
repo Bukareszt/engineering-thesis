@@ -2,6 +2,7 @@ export type ExecutableAction = {
   readonly address: string;
   readonly name: string;
   readonly id: string;
+  readonly description: string;
 };
 
 export interface ExecutableActionsRepository {
@@ -11,32 +12,37 @@ export interface ExecutableActionsRepository {
   getAll(): Promise<ExecutableAction[]>;
 }
 
-export const inMemoryExecutableActionsRepository =
-  (): ExecutableActionsRepository => {
-    const actions: Map<string, ExecutableAction> = new Map();
-    const applyAction = (action: ExecutableAction) => {
-      actions.set(action.id, action);
-      return Promise.resolve();
-    };
+export const inMemoryExecutableActionsRepository = () => {
+  const actions: Map<string, ExecutableAction> = new Map();
 
-    const get = (id: string) => {
-      return Promise.resolve(actions.get(id));
-    };
-
-    const getAll = () => {
-      return Promise.resolve(Array.from(actions.values()));
-    };
-
-    const getByName = (name: string) => {
-      return Promise.resolve(
-        Array.from(actions.values()).find((action) => action.name === name)
-      );
-    };
-
-    return {
-      applyAction,
-      get,
-      getAll,
-      getByName
-    };
+  const applyAction = (action: ExecutableAction) => {
+    actions.set(action.id, action);
+    return Promise.resolve();
   };
+
+  const get = (id: string) => {
+    return Promise.resolve(actions.get(id));
+  };
+
+  const getAll = () => {
+    return Promise.resolve(Array.from(actions.values()));
+  };
+
+  const getByName = (name: string) => {
+    return Promise.resolve(
+      Array.from(actions.values()).find((action) => action.name === name)
+    );
+  };
+
+  const clear = () => {
+    actions.clear();
+  };
+
+  return {
+    applyAction,
+    get,
+    getAll,
+    getByName,
+    clear
+  };
+};

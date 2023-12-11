@@ -1,31 +1,26 @@
-import { TriggersRepository } from './TriggersRepository';
 import { ExecuteNode } from '../../commands/ExecuteNode';
-import { GetWorkflow } from '../../commands/GetWorkflow';
+import { GetWorkflows } from '../../commands/GetWorkflows';
+import { WorkflowNode } from '../../models/WorkflowNode';
+import { GetTrigger } from './GetTrigger';
 
 export type TriggerWorkflow = (triggerId: string) => Promise<void>;
 export const triggerWorkflow =
   (
-    triggersRepository: TriggersRepository,
-    getWorkflow: GetWorkflow,
+    getTrigger: GetTrigger,
+    getWorkflows: GetWorkflows,
     executeNode: ExecuteNode
   ): TriggerWorkflow =>
   async (triggerId: string) => {
-    const trigger = await triggersRepository.get(triggerId);
+    const trigger = await getTrigger(triggerId);
+
     if (!trigger) {
       throw new Error('Trigger not found');
     }
 
-    const workflow = await getWorkflow(trigger.workflowId);
+    const workflows = await getWorkflows();
 
-    if (!workflow) {
-      throw new Error('Workflow not found');
-    }
-
-    const node = workflow.getById(trigger.nodeId);
-
-    if (!node) {
-      throw new Error('Node not found');
-    }
-
-    await executeNode(node);
+    const nodesToRun: WorkflowNode[] = workflows
+      .map((workflow) => workflow.getByTriggerId(trigger.id))
+      .flat();
+    await Promise.all(nodesToRun.map(async (node) => await executeNode(node)));
   };

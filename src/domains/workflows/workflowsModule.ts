@@ -1,5 +1,5 @@
 import { IdGenerator } from '../../adapters/idGenerator';
-import { inMemoryActionsExecutor } from './adapters/inMemoryActionsExecutor';
+import { httpActionsExecutor } from './adapters/httpActionsExecutor';
 import { inMemoryPendingExecutionsRepository } from './adapters/inMemoryPendingExecutionsRepository';
 import { inMemoryWorkflowRepository } from './adapters/inMemoryWorkflowRepository';
 import { AddWorkflow, addWorkflow } from './commands/AddWorkflow';
@@ -8,19 +8,22 @@ import {
   FinishNodeExecution,
   finishNodeExecution
 } from './commands/FinishNodeExecution';
-import { getWorkflow } from './commands/GetWorkflow';
+import { GetWorkflows, getWorkflows } from './commands/GetWorkflows';
 import {
   ExecutableActionsModule,
   executableActionsModule
 } from './subdomains/executableActions/ExecutableActionsModule';
+import { inMemoryExecutableActionsRepository } from './subdomains/executableActions/ExecutableActionsRepository';
 import {
   TriggersModule,
   triggersModule
 } from './subdomains/triggers/TriggersModule';
+import { inMemoryTriggersRepository } from './subdomains/triggers/TriggersRepository';
 
 export type WorkflowsModule = {
   addWorkflow: AddWorkflow;
   finishNodeExecution: FinishNodeExecution;
+  getAll: GetWorkflows;
 };
 
 export const workflowsModule = ({
@@ -34,24 +37,27 @@ export const workflowsModule = ({
 } => {
   const workflowsRepository = inMemoryWorkflowRepository();
   const pendingActionsRepository = inMemoryPendingExecutionsRepository();
-  const actionsExecutor = inMemoryActionsExecutor(pendingActionsRepository);
+  const actionsExecutor = httpActionsExecutor(pendingActionsRepository);
   const executeNodeCommand = executeNode(actionsExecutor, idGenerator);
-  const getWorkflowCommand = getWorkflow(workflowsRepository);
+  const getAllWorkflows = getWorkflows(workflowsRepository);
 
   const triggersMdl = triggersModule({
     idGenerator,
-    getWorkflow: getWorkflowCommand,
-    executeNode: executeNodeCommand
+    getAllWorkflows,
+    executeNode: executeNodeCommand,
+    repository: inMemoryTriggersRepository()
   });
 
   const executableActionsMdl = executableActionsModule({
     idGenerator,
-    actionsExecutor
+    actionsExecutor,
+    repository: inMemoryExecutableActionsRepository()
   });
 
   const addWorkflowCommand = addWorkflow(
     workflowsRepository,
     executableActionsMdl.getExecutableAction,
+    triggersMdl.getTrigger,
     idGenerator
   );
   const finishNodeExecutionCommand = finishNodeExecution(
@@ -65,7 +71,8 @@ export const workflowsModule = ({
     triggersModule: triggersMdl,
     workflowsModule: {
       addWorkflow: addWorkflowCommand,
-      finishNodeExecution: finishNodeExecutionCommand
+      finishNodeExecution: finishNodeExecutionCommand,
+      getAll: getAllWorkflows
     }
   };
 };

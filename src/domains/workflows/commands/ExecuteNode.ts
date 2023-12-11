@@ -6,6 +6,6 @@ export type ExecuteNode = (node: WorkflowNode) => Promise<void>;
 export const executeNode =
   (actionsExecutor: ActionsExecutor, idGenerator: IdGenerator): ExecuteNode =>
   async (node: WorkflowNode) => {
-    const executionId = idGenerator.generate();
-    await actionsExecutor.sendToExecution(executionId, node);
+    const executionId = idGenerator();
+    await actionsExecutor(executionId, node);
   };

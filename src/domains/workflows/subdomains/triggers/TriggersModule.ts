@@ -1,38 +1,44 @@
 import { IdGenerator } from '../../../../adapters/idGenerator';
 import { ExecuteNode } from '../../commands/ExecuteNode';
-import { GetWorkflow } from '../../commands/GetWorkflow';
+import { GetWorkflows } from '../../commands/GetWorkflows';
 import { AddTrigger, addTrigger } from './AddTrigger';
+import { getTrigger } from './GetTrigger';
 import { GetTriggers, getTriggers } from './GetTriggers';
+import { Trigger } from './Trigger';
 import { TriggerWorkflow, triggerWorkflow } from './TriggerWorkflow';
-import { inMemoryTriggersRepository } from './TriggersRepository';
+import { TriggersRepository } from './TriggersRepository';
 
 export type TriggersModule = {
   readonly getTriggers: GetTriggers;
   readonly addTrigger: AddTrigger;
   readonly triggerWorkflow: TriggerWorkflow;
+  readonly getTrigger: (id: string) => Promise<Trigger | undefined>;
 };
 export const triggersModule = ({
   idGenerator,
-  getWorkflow,
-  executeNode
+  executeNode,
+  getAllWorkflows,
+  repository
 }: {
   idGenerator: IdGenerator;
-  getWorkflow: GetWorkflow;
   executeNode: ExecuteNode;
+  getAllWorkflows: GetWorkflows;
+  repository: TriggersRepository;
 }): TriggersModule => {
-  const repository = inMemoryTriggersRepository();
-
+  const getTriggerCommand = getTrigger(repository);
   const getTriggersCommand = getTriggers(repository);
-  const addTriggerCommand = addTrigger(repository, getWorkflow, idGenerator);
   const triggerWorkflowCommand = triggerWorkflow(
-    repository,
-    getWorkflow,
+    getTriggerCommand,
+    getAllWorkflows,
     executeNode
   );
+
+  const addTriggerCommand = addTrigger(repository, idGenerator);
 
   return {
     getTriggers: getTriggersCommand,
     addTrigger: addTriggerCommand,
-    triggerWorkflow: triggerWorkflowCommand
+    triggerWorkflow: triggerWorkflowCommand,
+    getTrigger: getTriggerCommand
   };
 };

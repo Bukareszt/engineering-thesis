@@ -7,6 +7,7 @@ export type Workflow = {
   remove: (action: WorkflowNode) => void;
   getNext: (action: WorkflowNode) => WorkflowNode[];
   getById: (id: string) => WorkflowNode | undefined;
+  getByTriggerId: (triggerId: string) => WorkflowNode[];
 };
 
 export const Workflow = (name: string, id: string): Workflow => {
@@ -18,6 +19,7 @@ export const Workflow = (name: string, id: string): Workflow => {
     nodes.set(to.id, to);
     edges.push({ from: from.id, to: to.id });
   };
+
   const remove = (node: WorkflowNode) => {
     nodes.delete(node.id);
     edges.filter((edge) => edge.from !== node.id && edge.to !== node.id);
@@ -32,12 +34,23 @@ export const Workflow = (name: string, id: string): Workflow => {
 
   const getById = (id: string): WorkflowNode | undefined => nodes.get(id);
 
+  const getByTriggerId = (triggerId: string): WorkflowNode[] => {
+    const node = Array.from(nodes.values()).find(
+      (node) => node.action.id === triggerId
+    );
+    if (!node) {
+      return [];
+    }
+    return getNext(node);
+  };
+
   return {
     id,
     name,
     addEdge,
     remove,
     getNext,
-    getById
+    getById,
+    getByTriggerId
   };
 };

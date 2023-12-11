@@ -24,12 +24,21 @@ export const workflowsRouter = ({
 }) => {
   const router = Router();
 
-  router.get('/', (req, res) => {});
+  router.get('/', async (req, res) => {
+    const result = await workflowsModule.getAll();
+    res.send(result);
+  });
 
   router.post('/', async (req, res) => {
     const reqBody = addWorkflowInput.parse(req.body);
     const id = await workflowsModule.addWorkflow(reqBody.name, reqBody.edges);
     res.send(id);
+  });
+
+  router.post('/executed/:id', async (req, res) => {
+    const id = req.params.id;
+    await workflowsModule.finishNodeExecution(id);
+    res.sendStatus(204);
   });
 
   return router;

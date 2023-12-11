@@ -4,9 +4,7 @@ import { TriggersModule } from '../domains/workflows/subdomains/triggers/Trigger
 
 const TriggerInput = z.object({
   name: z.string(),
-  type: z.enum(['webhook', 'timer']),
-  workflowId: z.string(),
-  nodeId: z.string()
+  description: z.string()
 });
 
 const ReleaseTrigger = z.object({

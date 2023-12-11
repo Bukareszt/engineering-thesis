@@ -1,6 +1,10 @@
 import { IdGenerator } from '../../../../adapters/idGenerator';
 import { ActionsExecutor } from '../../ports/ActionsExecutor';
-import { inMemoryExecutableActionsRepository } from './ExecutableActionsRepository';
+import { ExecutableActionsRepository } from './ExecutableActionsRepository';
+import {
+  GetAllExecutableActions,
+  getAllExecutableActions
+} from './GetAllExecutableActions';
 import {
   GetExecutableAction,
   getExecutableActions
@@ -13,16 +17,17 @@ import {
 export type ExecutableActionsModule = {
   registerExecutableAction: RegisterExecutableAction;
   getExecutableAction: GetExecutableAction;
+  getAllActions: GetAllExecutableActions;
 };
 export const executableActionsModule = ({
   actionsExecutor,
-  idGenerator
+  idGenerator,
+  repository
 }: {
   actionsExecutor: ActionsExecutor;
   idGenerator: IdGenerator;
+  repository: ExecutableActionsRepository;
 }): ExecutableActionsModule => {
-  const repository = inMemoryExecutableActionsRepository();
-
   const registerExecutableActionCommand = registerExecutableAction(
     repository,
     actionsExecutor,
@@ -30,8 +35,11 @@ export const executableActionsModule = ({
   );
   const getExecutableActionsCommand = getExecutableActions(repository);
 
+  const getAllActions = getAllExecutableActions(repository);
+
   return {
     getExecutableAction: getExecutableActionsCommand,
-    registerExecutableAction: registerExecutableActionCommand
+    registerExecutableAction: registerExecutableActionCommand,
+    getAllActions
   };
 };

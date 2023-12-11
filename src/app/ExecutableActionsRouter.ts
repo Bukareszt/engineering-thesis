@@ -4,7 +4,8 @@ import { ExecutableActionsModule } from '../domains/workflows/subdomains/executa
 
 const RegisterExecutableActionInput = z.object({
   name: z.string(),
-  address: z.string()
+  address: z.string(),
+  description: z.string()
 });
 export const executableActionsRouter = ({
   executableActionsModule
@@ -14,8 +15,7 @@ export const executableActionsRouter = ({
   const router = Router();
 
   router.get('/', async (req, res) => {
-    const executableActions =
-      await executableActionsModule.getExecutableAction('dwa');
+    const executableActions = await executableActionsModule.getAllActions();
     res.send(executableActions);
   });
 

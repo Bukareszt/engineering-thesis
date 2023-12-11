@@ -1,9 +1,5 @@
 import { randomUUID } from 'crypto';
 
-export interface IdGenerator {
-  generate(): string;
-}
+export type IdGenerator = () => string;
 
-export const idGenerator: IdGenerator = {
-  generate: () => randomUUID()
-};
+export const idGenerator: IdGenerator = () => randomUUID();

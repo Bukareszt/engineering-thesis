@@ -1,22 +1,21 @@
-import myEmitter from '../../../globals';
-
+import axios from 'axios';
 import { WorkflowNode } from '../models/WorkflowNode';
 import { ActionsExecutor } from '../ports/ActionsExecutor';
 import { PendingExecutionsRepository } from '../ports/PendingExecutionsRepository';
 
-export const inMemoryActionsExecutor =
+export const httpActionsExecutor =
   (pendingExecutionsRepository: PendingExecutionsRepository): ActionsExecutor =>
   async (executionId: string, workflowNode: WorkflowNode) => {
+    if (!containsAddress(workflowNode.action)) {
+      throw new Error('Action is not valid');
+    }
     await pendingExecutionsRepository.save({
       id: executionId,
       status: 'pending',
       workflowNode
     });
 
-    myEmitter.emit('actionExecuted', {
-      ...workflowNode.action,
-      executionId
-    });
+    await axios.post(`${workflowNode.action.address}/execute/${executionId}`);
 
     await pendingExecutionsRepository.save({
       id: executionId,
@@ -24,3 +23,7 @@ export const inMemoryActionsExecutor =
       workflowNode
     });
   };
+
+const containsAddress = (obj: unknown): obj is { address: string } => {
+  return (obj as { address: string }).address !== undefined;
+};

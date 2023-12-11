@@ -6,8 +6,9 @@ export interface TriggersRepository {
   getAll(): Promise<Trigger[]>;
 }
 
-export const inMemoryTriggersRepository = (): TriggersRepository => {
+export const inMemoryTriggersRepository = () => {
   const db = new Map<string, Trigger>();
+
   const save = (trigger: Trigger) => {
     db.set(trigger.id, trigger);
     return Promise.resolve();
@@ -21,9 +22,14 @@ export const inMemoryTriggersRepository = (): TriggersRepository => {
     return Promise.resolve(Array.from(db.values()));
   };
 
+  const clear = () => {
+    db.clear();
+  };
+
   return {
     save,
     get,
-    getAll
+    getAll,
+    clear
   };
 };

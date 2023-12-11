@@ -5,7 +5,8 @@ import { ExecutableActionsRepository } from './ExecutableActionsRepository';
 export type RegisterExecutableAction = (actionToRegister: {
   readonly address: string;
   readonly name: string;
-}) => Promise<void>;
+  readonly description: string;
+}) => Promise<string>;
 
 export const registerExecutableAction =
   (
@@ -16,29 +17,24 @@ export const registerExecutableAction =
   async (actionToRegister: {
     readonly address: string;
     readonly name: string;
+    readonly description: string;
   }) => {
-    const existingAction = await actionsRegister.getByName(
-      actionToRegister.name
-    );
-
-    if (existingAction) {
-      return;
-    }
-
     const executable = {
       ...actionToRegister,
-      id: idGenerator.generate()
+      id: idGenerator()
     };
 
-    const executionId = idGenerator.generate();
+    const executionId = idGenerator();
 
     const workflowNode = {
-      id: idGenerator.generate(),
+      id: idGenerator(),
       action: executable,
       workflowId: ''
     };
 
-    await actionsExecutor.sendToExecution(executionId, workflowNode);
+    await actionsExecutor(executionId, workflowNode);
 
     await actionsRegister.applyAction(executable);
+
+    return executable.id;
   };
