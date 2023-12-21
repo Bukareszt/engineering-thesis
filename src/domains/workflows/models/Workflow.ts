@@ -3,14 +3,21 @@ import { WorkflowNode } from './WorkflowNode';
 export type Workflow = {
   readonly id: string;
   readonly name: string;
+  readonly userId: string;
   addEdge: (from: WorkflowNode, to: WorkflowNode) => void;
   remove: (action: WorkflowNode) => void;
   getNext: (action: WorkflowNode) => WorkflowNode[];
   getById: (id: string) => WorkflowNode | undefined;
   getByTriggerId: (triggerId: string) => WorkflowNode[];
+  getNodes: () => WorkflowNode[];
+  getEdges: () => { from: string; to: string }[];
 };
 
-export const Workflow = (name: string, id: string): Workflow => {
+export const Workflow = (
+  name: string,
+  id: string,
+  userId: string
+): Workflow => {
   const nodes = new Map<string, WorkflowNode>();
   const edges: { from: string; to: string }[] = [];
 
@@ -44,13 +51,20 @@ export const Workflow = (name: string, id: string): Workflow => {
     return getNext(node);
   };
 
+  const getNodes = () => Array.from(nodes.values());
+
+  const getEdges = () => edges;
+
   return {
     id,
     name,
+    userId,
     addEdge,
     remove,
     getNext,
     getById,
-    getByTriggerId
+    getByTriggerId,
+    getNodes,
+    getEdges
   };
 };

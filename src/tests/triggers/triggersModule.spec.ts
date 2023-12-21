@@ -2,7 +2,8 @@ import { expect } from 'chai';
 import { Workflow } from '../../domains/workflows/models/Workflow';
 import { WorkflowNode } from '../../domains/workflows/models/WorkflowNode';
 import { triggersModule } from '../../domains/workflows/subdomains/triggers/TriggersModule';
-import { inMemoryTriggersRepository } from '../../domains/workflows/subdomains/triggers/TriggersRepository';
+
+import { inMemoryTriggersRepository } from '../../adapters/inMemoryTriggersRepository';
 
 describe('TriggersModule', () => {
   const repository = inMemoryTriggersRepository();

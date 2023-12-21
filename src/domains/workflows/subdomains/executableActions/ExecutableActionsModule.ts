@@ -1,32 +1,40 @@
 import { IdGenerator } from '../../../../adapters/idGenerator';
+import { GetWorkflows } from '../../commands/GetWorkflows';
 import { ActionsExecutor } from '../../ports/ActionsExecutor';
-import { ExecutableActionsRepository } from './ExecutableActionsRepository';
 import {
   GetAllExecutableActions,
   getAllExecutableActions
-} from './GetAllExecutableActions';
+} from './commands/GetAllExecutableActions';
 import {
   GetExecutableAction,
   getExecutableActions
-} from './GetExecutableAction';
+} from './commands/GetExecutableAction';
 import {
   RegisterExecutableAction,
   registerExecutableAction
-} from './RegisterExecutableAction';
+} from './commands/RegisterExecutableAction';
+import {
+  RemoveExecutableAction,
+  removeExecutableAction
+} from './commands/RemoveExecutableAction';
+import { ExecutableActionsRepository } from './ports/ExecutableActionsRepository';
 
 export type ExecutableActionsModule = {
   registerExecutableAction: RegisterExecutableAction;
   getExecutableAction: GetExecutableAction;
   getAllActions: GetAllExecutableActions;
+  removeExecutableAction: RemoveExecutableAction;
 };
 export const executableActionsModule = ({
   actionsExecutor,
   idGenerator,
-  repository
+  repository,
+  getWorkflows
 }: {
   actionsExecutor: ActionsExecutor;
   idGenerator: IdGenerator;
   repository: ExecutableActionsRepository;
+  getWorkflows: GetWorkflows;
 }): ExecutableActionsModule => {
   const registerExecutableActionCommand = registerExecutableAction(
     repository,
@@ -37,9 +45,12 @@ export const executableActionsModule = ({
 
   const getAllActions = getAllExecutableActions(repository);
 
+  const remove = removeExecutableAction(repository, getWorkflows);
+
   return {
     getExecutableAction: getExecutableActionsCommand,
     registerExecutableAction: registerExecutableActionCommand,
-    getAllActions
+    getAllActions,
+    removeExecutableAction: remove
   };
 };

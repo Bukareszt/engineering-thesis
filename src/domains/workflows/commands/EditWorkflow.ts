@@ -1,70 +1,31 @@
-import { IdGenerator } from '../../../adapters/idGenerator';
 import { User } from '../../users/models/User';
 import { Workflow } from '../models/Workflow';
 import { WorkflowRepository } from '../ports/WorkflowRepository';
-import { ExecutableAction } from '../subdomains/executableActions/ExecutableAction';
 import { GetExecutableAction } from '../subdomains/executableActions/commands/GetExecutableAction';
 import { Trigger } from '../subdomains/triggers/Trigger';
+import { assertAllActionsAreDefined, WorkflowNodeDto } from './AddWorkflow';
 import { isDAG } from './IsDAG';
-export type WorkflowNodeDto = {
-  readonly actionId: string;
-  readonly id: string;
-  readonly viewProps: {
-    x: number;
-    y: number;
-  };
-};
 
-export type AddWorkflow = (
+export type EditWorkflow = (
+  id: string,
   name: string,
   edges: { from: WorkflowNodeDto; to: WorkflowNodeDto }[],
   user: User
 ) => Promise<string>;
 
-export type WorkflowEdge = {
-  from: {
-    id: string;
-    action: ExecutableAction;
-    viewProps: { x: number; y: number };
-  };
-  to: {
-    id: string;
-    action: ExecutableAction;
-    viewProps: { x: number; y: number };
-  };
-};
-
-export function assertAllActionsAreDefined(
-  edges: {
-    from: {
-      id: string;
-      action: ExecutableAction | Trigger | undefined;
-      viewProps: { x: number; y: number };
-    };
-    to: {
-      id: string;
-      action: ExecutableAction | undefined;
-      viewProps: { x: number; y: number };
-    };
-  }[]
-): asserts edges is WorkflowEdge[] {
-  if (edges.some((edge) => !edge.from.action || !edge.to.action)) {
-    throw new Error('Workflow must have valid actions');
-  }
-}
-export const addWorkflow =
+export const editWorkflow =
   (
     workflowRepository: WorkflowRepository,
     getExecutableAction: GetExecutableAction,
-    getTrigger: (id: string) => Promise<Trigger | undefined>,
-    idGenerator: IdGenerator
-  ): AddWorkflow =>
+    getTrigger: (id: string) => Promise<Trigger | undefined>
+  ): EditWorkflow =>
   async (
+    id: string,
     name: string,
     edgesDto: { from: WorkflowNodeDto; to: WorkflowNodeDto }[],
     user: User
   ): Promise<string> => {
-    const workflow = Workflow(name, idGenerator(), user.id);
+    const workflow = Workflow(name, id, user.id);
     const edges = await Promise.all(
       edgesDto.map(async (edge) => ({
         from: {
@@ -92,11 +53,13 @@ export const addWorkflow =
       workflow.addEdge(
         {
           ...edge.from,
-          workflowId: workflow.id
+          workflowId: workflow.id,
+          viewProps: edge.from.viewProps
         },
         {
           ...edge.to,
-          workflowId: workflow.id
+          workflowId: workflow.id,
+          viewProps: edge.to.viewProps
         }
       )
     );

@@ -1,12 +1,8 @@
 export const isDAG = (edges: { from: string; to: string }[]): boolean => {
   const graph = new Map<string, string[]>();
 
-  for (const edge of edges) {
-    const { from, to } = edge;
-    if (!graph.has(from)) {
-      graph.set(from, []);
-    }
-    graph.get(from)!.push(to);
+  for (const { from, to } of edges) {
+    graph.set(from, [...(graph.get(from) || []), to]);
   }
 
   const visited = new Set<string>();
@@ -31,7 +27,7 @@ export const isDAG = (edges: { from: string; to: string }[]): boolean => {
     return false;
   };
 
-  for (const [node] of graph) {
+  for (const node of graph.keys()) {
     if (!visited.has(node)) {
       if (hasCycle(node)) {
         return false;
