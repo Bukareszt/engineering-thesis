@@ -5,11 +5,12 @@ import { TriggersRepository } from '../domains/workflows/subdomains/triggers/por
 
 export const sqlTriggersRepository = (db: Kysely<DB>): TriggersRepository => {
   const save = async (trigger: Trigger) => {
+    const { userId, ...rest } = trigger;
     await db
       .insertInto('triggers')
       .values({
-        ...trigger,
-        user_id: trigger.userId
+        ...rest,
+        user_id: userId
       })
       .execute();
   };

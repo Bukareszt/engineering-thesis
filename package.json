@@ -6,11 +6,12 @@
   "scripts": {
     "test:unit": "ts-mocha ./tests/*spec.ts",
     "start:engine": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "start:action": "ts-node-dev --respawn --transpile-only src/action2.ts",
     "lint-and-fix": "eslint . --ext .ts --fix",
     "migrate:latest": "DATABASE_URL=postgres://postgres:postgres@localhost:5000/engine ts-node src/db/migrate-to-latest.ts",
-    "migrate:down": "DATABASE_URL=postgres://postgres:postgres@localhost:5000/engine ts-node src/db/migrate-down.ts",
-    "generate:types": "DATABASE_URL=postgres://postgres:postgres@localhost:5000/engine kysely-codegen --out-file=src/db/dbTypes.ts"
+    "migrate:down": "DATABASE_URL=${DATABASE_URL} ts-node src/db/migrate-down.ts",
+    "generate:types": "DATABASE_URL=${DATABASE_URL} kysely-codegen --out-file=src/db/dbTypes.ts",
+    "build": "tsc",
+    "start:prod": "node build/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -35,10 +36,10 @@
     "prettier-plugin-sort-imports": "^1.7.2",
     "ts-mocha": "^10.0.0",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "@types/jsonwebtoken": "^9.0.5"
   },
   "dependencies": {
-    "@types/jsonwebtoken": "^9.0.5",
     "axios": "^1.6.2",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",

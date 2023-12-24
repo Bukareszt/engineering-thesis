@@ -7,9 +7,10 @@ export const sqlExecutableActionsRepository = (
   db: Kysely<DB>
 ): ExecutableActionsRepository => {
   const applyAction = async (action: ExecutableAction) => {
+    const { userId, ...rest } = action;
     await db
       .insertInto('executable_actions')
-      .values({ ...action, user_id: action.userId })
+      .values({ ...rest, user_id: userId })
       .execute();
   };
 

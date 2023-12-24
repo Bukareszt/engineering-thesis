@@ -103,7 +103,7 @@ export const workflowsRouter = ({
     res.send(id);
   });
 
-  router.post('/executed/:id', authenticateToken, async (req, res) => {
+  router.post('/executed/:id', async (req, res) => {
     const id = req.params.id;
     await workflowsModule.finishNodeExecution(id);
     res.sendStatus(204);
