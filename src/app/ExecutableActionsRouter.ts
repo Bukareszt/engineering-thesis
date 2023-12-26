@@ -63,11 +63,18 @@ export const executableActionsRouter = ({
       res.sendStatus(403);
       return;
     }
-
-    await executableActionsModule.registerExecutableAction(
-      executableActionDTO,
-      user
-    );
+    try {
+      await executableActionsModule.registerExecutableAction(
+        executableActionDTO,
+        user
+      );
+    } catch (e: any) {
+      if (e.message.includes('sending request to action')) {
+        res.status(400).json(e.message);
+        return;
+      }
+      throw e;
+    }
 
     res.sendStatus(204);
   });

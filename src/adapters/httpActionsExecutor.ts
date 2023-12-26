@@ -14,14 +14,17 @@ export const httpActionsExecutor =
       status: 'pending',
       workflowNode
     });
+    try {
+      await axios.post(`${workflowNode.action.address}/execute/${executionId}`);
 
-    await axios.post(`${workflowNode.action.address}/execute/${executionId}`);
-
-    await pendingExecutionsRepository.save({
-      id: executionId,
-      status: 'send',
-      workflowNode
-    });
+      await pendingExecutionsRepository.save({
+        id: executionId,
+        status: 'send',
+        workflowNode
+      });
+    } catch (e) {
+      throw new Error('Problem with sending request to action');
+    }
   };
 
 const containsAddress = (obj: unknown): obj is { address: string } => {

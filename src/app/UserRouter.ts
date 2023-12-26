@@ -4,8 +4,8 @@ import { z } from 'zod';
 import { UsersModule } from '../domains/users/usersModule';
 
 const userInput = z.object({
-  username: z.string(),
-  password: z.string()
+  username: z.string().min(3, 'Username must be at least 3 characters'),
+  password: z.string().min(3, 'Password must be at least 3 characters')
 });
 
 export const usersRouter = ({ usersModule }: { usersModule: UsersModule }) => {
@@ -13,8 +13,12 @@ export const usersRouter = ({ usersModule }: { usersModule: UsersModule }) => {
 
   router.post('/register', async (req, res) => {
     const user = userInput.parse(req.body);
-    await usersModule.createUser(user.username, user.password);
-    res.sendStatus(204);
+    try {
+      await usersModule.createUser(user.username, user.password);
+      res.sendStatus(204);
+    } catch (e: any) {
+      res.status(400).json(e.message);
+    }
   });
 
   router.post('/login', async (req, res) => {

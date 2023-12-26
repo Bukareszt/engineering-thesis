@@ -75,13 +75,22 @@ export const workflowsRouter = ({
     }
 
     const reqBody = addWorkflowInput.parse(req.body);
-    const id = await workflowsModule.editWorkflow(
-      req.params.id,
-      reqBody.name,
-      reqBody.edges,
-      user
-    );
-    res.send(id);
+    try {
+      const id = await workflowsModule.editWorkflow(
+        req.params.id,
+        reqBody.name,
+        reqBody.edges,
+        user
+      );
+
+      res.send(id);
+    } catch (e: any) {
+      if (e.message.includes('must not contain cycles')) {
+        res.status(400).json(e.message);
+        return;
+      }
+      throw e;
+    }
   });
 
   router.post('/', authenticateToken, async (req, res) => {
@@ -95,12 +104,21 @@ export const workflowsRouter = ({
       return;
     }
 
-    const id = await workflowsModule.addWorkflow(
-      reqBody.name,
-      reqBody.edges,
-      user
-    );
-    res.send(id);
+    try {
+      const id = await workflowsModule.addWorkflow(
+        reqBody.name,
+        reqBody.edges,
+        user
+      );
+      res.send(id);
+      return;
+    } catch (e: any) {
+      if (e.message.includes('must not contain cycles')) {
+        res.status(400).json(e.message);
+        return;
+      }
+      throw e;
+    }
   });
 
   router.post('/executed/:id', async (req, res) => {

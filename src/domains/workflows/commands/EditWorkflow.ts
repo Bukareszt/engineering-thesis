@@ -46,7 +46,7 @@ export const editWorkflow =
     assertAllActionsAreDefined(edges);
 
     if (!isDAG(edges.map((edge) => ({ from: edge.from.id, to: edge.to.id })))) {
-      throw new Error('Workflow must be DAG');
+      throw new Error('Workflow must not contain cycles.');
     }
 
     edges.forEach((edge) =>

@@ -46,6 +46,8 @@ export const bootstrap = ({
   app.use('/workflows', workflowsRouter({ workflowsModule, usersModule }));
 
   app.use('/users', usersRouter({ usersModule }));
+
+  app.use(handleErrors);
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
   });
@@ -58,7 +60,7 @@ const handleErrors = (
   next: NextFunction
 ) => {
   if (err instanceof ZodError) {
-    return res.status(400).json(err.issues);
+    return res.status(400).json(err.issues.map((issue) => issue.message));
   }
 
   return res.status(500).json({ message: 'Internal server error' });
