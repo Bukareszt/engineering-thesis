@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:unit": "ts-mocha ./tests/*spec.ts",
+    "test:unit": "ts-mocha ./tests/**/*spec.ts",
     "start:engine": "ts-node-dev --respawn --transpile-only src/index.ts",
     "lint-and-fix": "eslint . --ext .ts --fix",
     "migrate:latest": "DATABASE_URL=postgres://postgres:postgres@localhost:5000/engine ts-node src/db/migrate-to-latest.ts",

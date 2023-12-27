@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import { inMemoryUsersRepository } from '../../adapters/InMemoryUsersRepository';
-import { idGenerator } from '../../adapters/idGenerator';
-import { usersModule } from '../../domains/users/usersModule';
+import { inMemoryUsersRepository } from '../../src/adapters/InMemoryUsersRepository';
+import { idGenerator } from '../../src/adapters/idGenerator';
+import { usersModule } from '../../src/domains/users/usersModule';
 
 describe('Users module', () => {
   describe('create user', () => {
@@ -18,7 +18,7 @@ describe('Users module', () => {
     });
   });
 
-  describe(' verifyPassword', () => {
+  describe('verifyPassword', () => {
     it('should return true on proper password', async () => {
       const repo = inMemoryUsersRepository();
       const module = usersModule({
